@@ -111,3 +111,33 @@
       state: started
       enabled: True
 
+
+  - name: Install ngnix
+    yum:
+      name: nginx
+      state: latest
+
+
+  - name: Set the nginx.conf file
+    copy:
+      src: nginx.conf
+      dest: /etc/nginx/nginx.conf
+      owner: root
+      group: root
+      mode: 0644
+
+
+  - name: Set the ncg-devops ncg modular configuration
+    template: 
+      src: ncg-devops.conf.j2
+      dest: /etc/nginx/conf.d/ncg-devops.conf
+      owner: root
+      group: root
+      mode: 0644
+
+
+  - name: Enable and start nginx
+    service: 
+      name: nginx
+      state: started
+      enabled: True
