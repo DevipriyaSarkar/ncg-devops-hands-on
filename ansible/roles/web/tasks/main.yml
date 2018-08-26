@@ -11,4 +11,32 @@
       group: vagrant
       mode: 0600
 
+  - name: Create the www directory
+    file:
+      path: /var/www
+      state: directory
+      mode: 0755
+      owner: root
+      group: root
 
+  - name: Create the ncg-devops directory
+    file:
+      path: /var/www/ncg-devops
+      state: directory
+      mode: 0755
+      owner: vagrant
+      group: vagrant
+
+
+  - name: Install git
+    yum:
+      name: git
+      state: latest
+
+  - name: Clone the git repo
+    git:
+      repo: 'git@gitlab.eng.vmware.com:abilgi/ncg-devops-hands-on.git'
+      dest: '/var/www/ncg-devops'
+      ssh_opts: "-o StrictHostKeyChecking=no"
+    become: True
+    become_user: vagrant
