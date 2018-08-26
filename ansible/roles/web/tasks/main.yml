@@ -1,0 +1,4 @@
+---
+
+  - name: Check if ansible works on the web server
+    ping:

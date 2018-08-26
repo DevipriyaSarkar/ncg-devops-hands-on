@@ -1,0 +1,15 @@
+---
+all:
+  children:
+    webservers:
+      hosts:
+        lc-dev-sample-web:
+          ansible_host: 127.0.0.1
+          ansible_port: 2351 
+          ansible_private_key_file: .vagrant/machines/lc-dev-sample-web/virtualbox/private_key
+    dbservers:
+      hosts:
+        lc-dev-sample-db:
+          ansible_host: 127.0.0.1
+          ansible_port: 2352 
+          ansible_private_key_file: .vagrant/machines/lc-dev-sample-db/virtualbox/private_key

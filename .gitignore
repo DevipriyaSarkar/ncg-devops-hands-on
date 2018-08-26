@@ -13,3 +13,4 @@ build/
 *.swp
 *~
 .vagrant/
+.DS_Store
