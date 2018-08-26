@@ -6,6 +6,11 @@
                     ":host": 2351,
                     ":guest": 22,
                     ":id": "ssh"
+                },
+                {
+                    ":host": 2380,
+                    ":guest": 80,
+                    ":id": "web"
                 }
             ],
             "network_configs": [
