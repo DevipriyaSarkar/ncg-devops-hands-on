@@ -2,3 +2,13 @@
 
   - name: Check if ansible works on the web server
     ping:
+
+  - name: Add gitlab private key
+    copy:
+      src: gitlab_id_rsa
+      dest: /home/vagrant/.ssh/id_rsa
+      owner: vagrant
+      group: vagrant
+      mode: 0600
+
+
