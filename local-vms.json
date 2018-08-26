@@ -1,0 +1,37 @@
+{
+    "nodes": {
+        "lc-dev-sample-web": {
+            "ports": [
+                {
+                    ":host": 2351,
+                    ":guest": 22,
+                    ":id": "ssh"
+                }
+            ],
+            "network_configs": [
+                {
+                    ":ip": "192.168.32.42",
+                    ":name": "vboxnet0",
+                    ":adapter": 2
+                }
+            ]
+        },
+
+        "lc-dev-sample-db": {
+            "ports": [
+                {
+                    ":host": 2352,
+                    ":guest": 22,
+                    ":id": "ssh"
+                }
+            ],
+            "network_configs": [
+                {
+                    ":ip": "192.168.32.43",
+                    ":name": "vboxnet0",
+                    ":adapter": 2
+                }
+            ]
+        }
+    }
+}
