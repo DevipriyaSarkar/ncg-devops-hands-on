@@ -75,3 +75,39 @@
         FLASK_APP: flaskr
         FLASK_ENV: development
 
+
+  - name: Install gunicorn
+    shell: /var/www/ncg-devops/venv/bin/pip install gunicorn
+    become: True
+    become_user: vagrant
+
+  - name: Install supervisord
+    yum:
+      name: supervisor
+      state: latest
+
+
+  - name: Create ncg-devops supervisord configuration
+    copy:
+      src: ncg-devops.ini
+      dest: /etc/supervisord.d/ncd-devops.ini
+      owner: vagrant
+      group: vagrant
+      mode: 0644
+
+
+  - name: Create ncg-devops log folder
+    file:
+      path: /var/log/ncg-devops
+      state: directory
+      mode: 0755
+      owner: root
+      group: root
+
+
+  - name: Enable and start supervisord
+    service: 
+      name: supervisord
+      state: started
+      enabled: True
+
