@@ -6,7 +6,7 @@ VAGRANTFILE_API_VERSION = "2"
 nodes_config = (JSON.parse(File.read("local-vms.json")))['nodes']
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "bento/centos-7.5"
+  config.vm.box = "bento/centos-7"
 
   nodes_config.each do |node|
     node_name   = node[0] # name of node
