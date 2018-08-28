@@ -53,17 +53,6 @@
   - name: Install pip
     shell: python36 -m ensurepip --default-pip
 
-  - name: Install MySQL-python
-    yum:
-      name: MySQL-python
-      state: latest
-
-
-  - name: Create a new database with name 'blog_data'
-    mysql_db:
-      name: blog_data
-      state: present
-
 
   - name: Create virtual env
     shell: python36 -m venv /var/www/ncg-devops/venv
@@ -73,12 +62,6 @@
 
   - name: Install web app
     shell: /var/www/ncg-devops/venv/bin/pip install -e /var/www/ncg-devops
-    become: True
-    become_user: vagrant
-
-
-  - name: Install flask-mysqldb
-    shell: /var/www/ncg-devops/venv/bin/pip install flask-mysqldb
     become: True
     become_user: vagrant
     
