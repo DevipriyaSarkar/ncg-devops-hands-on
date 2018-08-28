@@ -1,4 +1,44 @@
 ---
+- name: Install packages
+  become: True
+  yum: name={{ item }}
+      state=installed
+  with_items:
+  - python-psycopg2
+  - postgresql-server
+  - postgresql
 
-  - name: Check if ansible works on the database server
-    ping:
+- name: Initiate database
+  command: service postgresql initdb
+          creates=/var/lib/pgsql/data/postgresql.conf
+
+- name: Start PostgreSQL and enable at boot
+  service: name=postgresql
+          enabled=yes
+          state=started
+
+- name: Ensure PostgreSQL is listening on all localhost
+  lineinfile: dest=/var/lib/pgsql/data/postgresql.conf
+    regexp='^#?listen_addresses\s*='
+    line="listen_addresses = '127.0.0.1'"
+    state=present
+  notify: restart postgresql
+
+- lineinfile: dest=/var/lib/pgsql/data/pg_hba.conf
+              regexp='host\s+all\s+all\s+127.0.0.1/32\s+md5'
+              line='host all all 127.0.0.1/32 md5'
+              insertbefore=BOF
+  notify: restart postgresql
+
+
+- name: Ensure database is created
+  become_user: postgres
+  postgresql_db: name={{ db_name }}
+
+- name: Ensure user has access to the database
+  become_user: postgres
+  postgresql_user: db={{ db_name }}
+               name={{ db_user }}
+               password={{ db_password }}
+               priv=ALL
+               state=present

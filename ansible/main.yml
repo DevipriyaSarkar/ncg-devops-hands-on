@@ -2,6 +2,8 @@
 
 - name: Configure the database server
   hosts: dbservers
+  vars_files:
+    - roles/database/vars/main.yml
   roles:
     - database
   become: True
