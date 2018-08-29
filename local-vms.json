@@ -28,6 +28,11 @@
                     ":host": 2352,
                     ":guest": 22,
                     ":id": "ssh"
+                },
+                {
+                    ":host": 2332,
+                    ":guest": 5432,
+                    ":id": "db"
                 }
             ],
             "network_configs": [
