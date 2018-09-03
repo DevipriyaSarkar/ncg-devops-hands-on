@@ -20,13 +20,13 @@
 - name: Ensure PostgreSQL is listening on all localhost
   lineinfile: dest=/var/lib/pgsql/data/postgresql.conf
     regexp='^#?listen_addresses\s*='
-    line="listen_addresses = '127.0.0.1'"
+    line="listen_addresses = '*'"
     state=present
   notify: restart postgresql
 
 - lineinfile: dest=/var/lib/pgsql/data/pg_hba.conf
-              regexp='host\s+all\s+all\s+127.0.0.1/32\s+md5'
-              line='host all all 127.0.0.1/32 md5'
+              regexp='host\s+all\s+all\s+127.0.0.1/32\s+ident'
+              line='host all all 127.0.0.1/0 md5'
               insertbefore=BOF
   notify: restart postgresql
 
