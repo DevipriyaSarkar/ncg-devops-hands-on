@@ -5,6 +5,8 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
+import psycopg2
+import logging ###
 
 bp = Blueprint('blog', __name__)
 
@@ -13,9 +15,12 @@ bp = Blueprint('blog', __name__)
 def index():
     """Show all the posts, most recent first."""
     db = get_db()
-    posts = db.execute(
+    logging.basicConfig(filename='example.log',level=logging.DEBUG)  ###
+    logging.debug("DB Closed: %d", db.closed)
+    logging.debug('DB: %s', str(db)) ####
+    posts = db.cursor().execute(
         'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' FROM post p JOIN blog_user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
     return render_template('blog/index.html', posts=posts)
@@ -33,9 +38,9 @@ def get_post(id, check_author=True):
     :raise 404: if a post with the given id doesn't exist
     :raise 403: if the current user isn't the author
     """
-    post = get_db().execute(
+    post = get_db().cursor().execute(
         'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
+        ' FROM post p JOIN blog_user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
     ).fetchone()
@@ -65,7 +70,7 @@ def create():
             flash(error)
         else:
             db = get_db()
-            db.execute(
+            db.cursor().execute(
                 'INSERT INTO post (title, body, author_id)'
                 ' VALUES (?, ?, ?)',
                 (title, body, g.user['id'])
@@ -94,7 +99,7 @@ def update(id):
             flash(error)
         else:
             db = get_db()
-            db.execute(
+            db.cursor().execute(
                 'UPDATE post SET title = ?, body = ? WHERE id = ?',
                 (title, body, id)
             )
@@ -114,6 +119,6 @@ def delete(id):
     """
     get_post(id)
     db = get_db()
-    db.execute('DELETE FROM post WHERE id = ?', (id,))
+    db.cursor().execute('DELETE FROM post WHERE id = ?', (id,))
     db.commit()
     return redirect(url_for('blog.index'))

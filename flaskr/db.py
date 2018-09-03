@@ -19,7 +19,7 @@ def get_db():
         db_port = "2332"
 
         conn = psycopg2.connect(database=db_name, user = db_user, password = db_password, host = db_host, port = db_port)
-        g.db = conn.cursor()
+        g.db = conn
 
     return g.db
 
@@ -39,9 +39,9 @@ def init_db():
     db = get_db()
 
     with current_app.open_resource('schema.sql') as f:
-        db.execute(f.read().decode('utf8'))
-
-    print("Initialise db")
+        for line in f:
+            db.cursor().execute(line)
+            db.commit()
 
 
 @click.command('init-db')
