@@ -64,6 +64,14 @@
     shell: /var/www/ncg-devops/venv/bin/pip install -e /var/www/ncg-devops
     become: True
     become_user: vagrant
+
+  - name: Install db packages
+    become: True
+    yum: name={{ item }}
+        state=installed
+    with_items:
+      - python-psycopg2
+      - postgresql
     
 
   - name: Initialize database
