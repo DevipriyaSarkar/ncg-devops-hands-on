@@ -32,9 +32,9 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = get_db().cursor().execute(
-            'SELECT * FROM blog_user WHERE id = ?', (user_id,)
-        ).fetchone()
+        cursor = get_db().cursor()
+        cursor.execute("SELECT * FROM blog_user WHERE id = %s", (user_id,))
+        g.user = cursor.fetchone()
 
 
 @bp.route('/register', methods=('GET', 'POST'))
@@ -50,20 +50,22 @@ def register():
         db = get_db()
         error = None
 
+        cursor = db.cursor()
+
         if not username:
             error = 'Username is required.'
         elif not password:
             error = 'Password is required.'
-        elif db.cursor().execute(
-            'SELECT id FROM blog_user WHERE username = ?', (username,)
-        ).fetchone() is not None:
-            error = 'User {0} is already registered.'.format(username)
+        else:
+            cursor.execute("SELECT id FROM blog_user WHERE username = %s", (username,))
+            if cursor.fetchone() is not None:
+                error = 'User {0} is already registered.'.format(username)
 
         if error is None:
             # the name is available, store it in the database and go to
             # the login page
             db.cursor().execute(
-                'INSERT INTO blog_user (username, password) VALUES (?, ?)',
+                "INSERT INTO blog_user (username, password) VALUES (%s, %s)",
                 (username, generate_password_hash(password))
             )
             db.commit()
@@ -82,19 +84,21 @@ def login():
         password = request.form['password']
         db = get_db()
         error = None
-        user = db.cursor().execute(
-            'SELECT * FROM blog_user WHERE username = ?', (username,)
-        ).fetchone()
+        cursor = db.cursor()
+        cursor.execute(
+            "SELECT * FROM blog_user WHERE username = %s", (username,)
+        )
+        user = cursor.fetchone()
 
         if user is None:
             error = 'Incorrect username.'
-        elif not check_password_hash(user['password'], password):
+        elif not check_password_hash(user[2], password):
             error = 'Incorrect password.'
 
         if error is None:
             # store the user id in a new session and return to the index
             session.clear()
-            session['user_id'] = user['id']
+            session['user_id'] = user[0]
             return redirect(url_for('index'))
 
         flash(error)

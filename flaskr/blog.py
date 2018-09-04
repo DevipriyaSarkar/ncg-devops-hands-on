@@ -6,7 +6,6 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.db import get_db
 import psycopg2
-import logging ###
 
 bp = Blueprint('blog', __name__)
 
@@ -15,14 +14,15 @@ bp = Blueprint('blog', __name__)
 def index():
     """Show all the posts, most recent first."""
     db = get_db()
-    logging.basicConfig(filename='example.log',level=logging.DEBUG)  ###
-    logging.debug("DB Closed: %d", db.closed)
-    logging.debug('DB: %s', str(db)) ####
-    posts = db.cursor().execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN blog_user u ON p.author_id = u.id'
-        ' ORDER BY created DESC'
-    ).fetchall()
+    cursor = db.cursor()
+    cursor.execute(
+        """
+        SELECT p.id, title, body, created, author_id, username
+         FROM post p JOIN blog_user u ON p.author_id = u.id 
+         ORDER BY created DESC
+        """
+    )
+    posts = cursor.fetchall()
     return render_template('blog/index.html', posts=posts)
 
 
@@ -38,17 +38,21 @@ def get_post(id, check_author=True):
     :raise 404: if a post with the given id doesn't exist
     :raise 403: if the current user isn't the author
     """
-    post = get_db().cursor().execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN blog_user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
+    cursor = get_db().cursor()
+    cursor.execute(
+        """
+        SELECT p.id, title, body, created, author_id, username
+         FROM post p JOIN blog_user u ON p.author_id = u.id
+         WHERE p.id = %s
+        """,
         (id,)
-    ).fetchone()
+    )
+    post = cursor.fetchone()
 
     if post is None:
         abort(404, "Post id {0} doesn't exist.".format(id))
 
-    if check_author and post['author_id'] != g.user['id']:
+    if check_author and post[1] != g.user[0]:
         abort(403)
 
     return post
@@ -71,8 +75,10 @@ def create():
         else:
             db = get_db()
             db.cursor().execute(
-                'INSERT INTO post (title, body, author_id)'
-                ' VALUES (?, ?, ?)',
+                """
+                INSERT INTO post (title, body, author_id)
+                 VALUES (%s, %s, %s)
+                """,
                 (title, body, g.user['id'])
             )
             db.commit()
@@ -100,7 +106,7 @@ def update(id):
         else:
             db = get_db()
             db.cursor().execute(
-                'UPDATE post SET title = ?, body = ? WHERE id = ?',
+                "UPDATE post SET title = %s, body = %s WHERE id = %s",
                 (title, body, id)
             )
             db.commit()
@@ -119,6 +125,6 @@ def delete(id):
     """
     get_post(id)
     db = get_db()
-    db.cursor().execute('DELETE FROM post WHERE id = ?', (id,))
+    db.cursor().execute("DELETE FROM post WHERE id = %s", (id,))
     db.commit()
     return redirect(url_for('blog.index'))
