@@ -52,7 +52,7 @@ def get_post(id, check_author=True):
     if post is None:
         abort(404, "Post id {0} doesn't exist.".format(id))
 
-    if check_author and post[1] != g.user[0]:
+    if check_author and post[4] != g.user[0]:
         abort(403)
 
     return post
@@ -79,7 +79,7 @@ def create():
                 INSERT INTO post (title, body, author_id)
                  VALUES (%s, %s, %s)
                 """,
-                (title, body, g.user['id'])
+                (title, body, g.user[0])
             )
             db.commit()
             return redirect(url_for('blog.index'))
